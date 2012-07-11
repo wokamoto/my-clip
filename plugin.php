@@ -58,7 +58,7 @@ class my_clip {
 	public function add_clip($content) {
 		$id = get_the_ID();
 		$icon = sprintf(
-			'<div class="clip_icon"><img src="%s" width="32" height="28" id="clip-%d"></div>',
+			'<img src="%s" width="32" height="28" id="clip-%d" class="clip_icon alignright">',
 			plugins_url('/images/clip_1.png', __FILE__),
 			$id
 			);
