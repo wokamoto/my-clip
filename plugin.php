@@ -37,6 +37,7 @@ class my_clip {
 
 	public function plugins_loaded() {
 		if ( !is_admin() ) {
+			add_action( 'content', array(&$this, 'add_clip') );
 			add_action( 'wp_enqueue_scripts', array(&$this,'add_scripts') );
 			add_action( 'wp_footer', array(&$this,'footer_scripts') );
 		}
@@ -52,6 +53,16 @@ class my_clip {
         echo "jQuery(function($){\n";
         echo "\n});\n";
         echo "</script>\n";
+	}
+	
+	public function add_clip($content) {
+		$id = get_the_ID();
+		$icon = sprintf(
+			'<div class="clip_icon"><img src="%s" width="32" height="28" id="clip-%d"></div>',
+			plugins_url('/images/clip_1.png', __FILE__),
+			$id
+			);
+		return $icon . $content;
 	}
 }
 
