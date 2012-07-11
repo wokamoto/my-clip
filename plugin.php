@@ -82,7 +82,13 @@ jQuery(function($){
 		foreach ( $post_ids as $post_id ) {
 			$post_id = intval(preg_replace('/[^0-9]/', '', $post_id));
 			if ($post = get_post( $post_id ))
-				$result[] = $post;
+				$result[] = array(
+					'id' => $post->ID,
+					'title' => $post->title,
+					'date' => $post->post_date,
+					'permalink' => get_permalink( $post->ID ),
+					'thumbnail' => has_post_thumbnail($post->ID) ? get_the_post_thumbnail($post->ID, 'thumbnail') : '',
+				);
 		}
 		header('Content-Type: application/json; charset=utf-8');
 		echo json_encode($result);
