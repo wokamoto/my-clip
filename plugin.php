@@ -33,20 +33,22 @@ class my_clip {
 
 	function __construct() {
 		if ( !is_admin() ) {
-			add_action( 'the_content', array(&$this, 'add_clip') );
-			add_action( 'wp_enqueue_scripts', array(&$this,'add_scripts') );
-			add_action( 'wp_footer', array(&$this,'footer_scripts') );
+			add_action('the_content', array(&$this, 'add_clip'));
+			add_action('wp_enqueue_scripts', array(&$this,'add_scripts'));
+			add_action('wp_footer', array(&$this,'footer_scripts'));
 		}
-		add_action( 'wp_ajax_clip_search', array(&$this, 'clip_search') );
-		add_action( 'wp_ajax_nopriv_clip_search', array(&$this, 'clip_search') );
+		add_action('wp_ajax_clip_search', array(&$this, 'clip_search'));
+		add_action('wp_ajax_nopriv_clip_search', array(&$this, 'clip_search') );
 	}
 
 	public function add_scripts() {
-		wp_enqueue_script( 'jquery' );
-		wp_enqueue_script( 'jquery.cookie', plugins_url('/js/jquery.cookie.js', __FILE__), array('jquery'), '1.1', true );
+		wp_enqueue_script('jquery');
+		wp_enqueue_script('jquery.cookie', plugins_url('/js/jquery.cookie.js', __FILE__), array('jquery'), '1.1', true);
 	}
 	
 	public function footer_scripts() {
+		$ajax_url = admin_url('admin-ajax.php') . '?action=clip_search';
+
         echo "<script>\n";
         echo "
 jQuery(function($){
@@ -56,11 +58,18 @@ jQuery(function($){
     var regexp = new RegExp('\"' + id + '\"');
     if ( !clips || !clips.match(regexp) ) {
       clips = (clips ? clips + ',' : '') + '\"' + id + '\"';
+      $.cookie('".self::COOKIE_KEY."', clips, 7);
+      $.ajax({
+        type: 'GET',
+        url: '".$ajax_url."',
+        dataType: 'json',
+        success: clip_set,
+      });
     }
-    $.cookie('".self::COOKIE_KEY."', clips, 7);
-
-    alert(clips);
   });
+  
+  function clip_set(data, dataType){
+  }
 });
 ";
         echo "</script>\n";
@@ -84,11 +93,11 @@ jQuery(function($){
 			if ($post = get_post( $post_id ))
 				$result[] = array(
 					'id' => $post->ID,
-					'title' => $post->title,
+					'title' => $post->post_title,
 					'date' => $post->post_date,
-					'permalink' => get_permalink( $post->ID ),
+					'permalink' => get_permalink($post->ID),
 					'thumbnail' => has_post_thumbnail($post->ID) ? get_the_post_thumbnail($post->ID, 'thumbnail') : '',
-					'post' => $post,
+					//'post' => $post,
 				);
 		}
 		header('Content-Type: application/json; charset=utf-8');
