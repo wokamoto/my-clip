@@ -154,27 +154,27 @@ class MyClipWidget extends WP_Widget {
 
 	public function update( $new_instance, $old_instance ) {
 		$instance = $new_instance;
-		if (isset($new_instance['title']))
-			$new_instance['title'] = strip_tags($instance['title']);
+		if (isset($instance['title']))
+			$instance['title'] = strip_tags($instance['title']);
 		return $instance;
 	}
 
 	public function form( $instance ) {
-		$instance = wp_parse_args( (array) $instance, array('title' => '', 'limit' => 5) );
+		$instance = wp_parse_args( (array) $instance, array('title' => '', 'limit' => '5') );
 		$input_format = '<p><label for="%2$s">%1$s</label><input class="widefat" id="%2$s" name="%3$s" type="text" value="%4$s" /></p>'."\n";
 		printf(
 			$input_format ,
 			__('Title:') ,
 			$this->get_field_id('title') ,
 			$this->get_field_name('title') ,
-			esc_attr($title)
+			esc_attr(strip_tags($instance['title']))
 		);
 		printf(
 			$input_format ,
 			__('Limit:') ,
 			$this->get_field_id('limit') ,
 			$this->get_field_name('limit') ,
-			intval($limit)
+			intval($instance['limit'])
 		);
 	}
 }
