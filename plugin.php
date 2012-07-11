@@ -84,21 +84,20 @@ jQuery(function($){
   
   function clip_set(data, dataType){
     $('.my-clip_wrap').each(function(){
-      var \$this = $(this);
-      var limit = \$this.attr('class').match(/limit-([0-9]+)/i);
+      var limit = $(this).attr('class').match(/limit-([0-9]+)/i);
       var count = 0;
-      var \$ul = $('<ul></ul>');
+      var ul = $('<ul></ul>');
       $.each(data, function(){
-        var \$li = $('<li id=\"my-clip-post-' + this.id + '\"></li>').append('<a href=\"' + this.permalink + '\">' + this.title + '</a>');
+        var li = $('<li id=\"my-clip-post-' + this.id + '\"></li>').append('<a href=\"' + this.permalink + '\">' + this.title + '</a>');
         count++;
         if ( count > limit[1] )
-          \$li.hide();
-        \$ul.append(\$li);
+          li.hide();
+        ul.append(li);
       });
-      if ( $('ul', \$this).length <= 0 ) {
-        $this.append('<ul></ul>');
+      if ( $('ul', $(this)).length <= 0 ) {
+        $(this).append('<ul></ul>');
       }
-      $('ul', \$this).replaceWith(\$ul);
+      $('ul', $(this)).replaceWith(ul);
     });
   }
 });
