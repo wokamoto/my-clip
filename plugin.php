@@ -51,18 +51,19 @@ class my_clip {
 	public function footer_scripts() {
         echo "<script>\n";
         echo "jQuery(function($){\n";
-        echo "
+		$js = <<< EOT
 $('.clip_icon').click(function(){
-  var clips = $.cookie('{self::COOKIE_KEY}');
+  var clips = $.cookie('%1$s');
   var id=$(this).attr('id').replace('clip-','');
   var regexp = new RegExp('\"' + id + '\"');
   if ( !clips || !clips.match(regexp) )
     clips = (clips ? clips + ',' : '') + '\"' + id + '\"';
-  $.cookie('{self::COOKIE_KEY}', clips, 7);
+  $.cookie('%1$s', clips, 7);
 
   alert(clips);
 });
-";
+EOT;
+		printf($js, self::COOKIE_KEY);
         echo "\n});\n";
         echo "</script>\n";
 	}
