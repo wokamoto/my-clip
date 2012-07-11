@@ -66,7 +66,7 @@ jQuery(function($){
     });
   }
 
-  $('.clip_icon').click(function(){
+  $('.clip_icon').unbind('click').click(function(){
     var clips = $.cookie('".self::COOKIE_KEY."');
     var id=$(this).attr('id').replace('clip-','');
     var regexp = new RegExp('\"' + id + '\"');
@@ -83,6 +83,23 @@ jQuery(function($){
   });
   
   function clip_set(data, dataType){
+    $('.my-clip_wrap').each(function(){
+      var $this = $(this);
+      var limit = $this.attr('class').match(/limit-([0-9]+)/i);
+      var count = 0;
+      var $ul = $('<ul></ul>');
+      $.each(data, function(){
+        var $li = $('<li id=\"my-clip-post-' + this.id + '\"></li>').append('<a href=\"' + this.permalink + '\">' + this.title + '</a>');
+        count++;
+        if ( count > limit[1] )
+          $li.hide();
+        $ul.append($li);
+      });
+      if ( $('ul', $this).length <= 0 ) {
+        $this.append('<ul></ul>');
+      }
+      $('ul', $this).replaceWith($ul);
+    });
   }
 });
 ";
@@ -114,6 +131,7 @@ jQuery(function($){
 					//'post' => $post,
 				);
 		}
+		rsort($result);
 		header('Content-Type: application/json; charset=utf-8');
 		echo json_encode($result);
 	    die();
