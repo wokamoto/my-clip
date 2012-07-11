@@ -40,7 +40,7 @@ class my_clip {
 			add_action( 'the_content', array(&$this, 'add_clip') );
 			add_action( 'wp_enqueue_scripts', array(&$this,'add_scripts') );
 			add_action( 'wp_footer', array(&$this,'footer_scripts') );
-			add_action( 'wp_ajax_nlmg_clip_search', array(&$this, 'clip_search') );
+			add_action( 'wp_ajax_clip_search', array(&$this, 'clip_search') );
 			add_action( 'wp_ajax_nopriv_clip_search', array(&$this, 'clip_search') );
 		}
 	}
