@@ -51,6 +51,14 @@ class my_clip {
 	public function footer_scripts() {
         echo "<script>\n";
         echo "jQuery(function($){\n";
+        echo <<EOT
+$('.clip_icon').click(function(){
+    var clips = $.cookie('{selef::COOKIE_KEY}');
+    alert(clips);
+    var id = $(this).attr('id').replace('clip-','');
+    alert(id);
+});
+>>
         echo "\n});\n";
         echo "</script>\n";
 	}
