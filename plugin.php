@@ -71,7 +71,7 @@ jQuery(function($){
     var id=$(this).attr('id').replace('clip-','');
     var regexp = new RegExp('\"' + id + '\"');
     if ( !clips || !clips.match(regexp) ) {
-      clips = (clips ? clips + ',' : '') + '\"' + id + '\"';
+      clips = '\"' + id + '\"' + (clips ? ',' + clips : '');
       $.cookie('".self::COOKIE_KEY."', clips, 7);
       $.ajax({
         type: 'GET',
@@ -130,7 +130,6 @@ jQuery(function($){
 					//'post' => $post,
 				);
 		}
-		rsort($result);
 		header('Content-Type: application/json; charset=utf-8');
 		echo json_encode($result);
 	    die();
