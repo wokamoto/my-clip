@@ -37,7 +37,7 @@ class my_clip {
 
 	public function plugins_loaded() {
 		if ( !is_admin() ) {
-			add_action( 'content', array(&$this, 'add_clip') );
+			add_action( 'the_content', array(&$this, 'add_clip') );
 			add_action( 'wp_enqueue_scripts', array(&$this,'add_scripts') );
 			add_action( 'wp_footer', array(&$this,'footer_scripts') );
 		}
