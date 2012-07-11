@@ -148,7 +148,7 @@ class MyClipWidget extends WP_Widget {
         echo $before_widget;
         if ( !empty($title) )
             echo $before_title . $title . $after_title;
-        echo '<div class="my-clip_wrap"></div>' . "\n";
+        printf('<div class="my-clip_wrap limit-%d"></div>' . "\n", intval($limit));
         echo $after_widget;
 	}
 
