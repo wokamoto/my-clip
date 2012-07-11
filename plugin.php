@@ -88,6 +88,7 @@ jQuery(function($){
 					'date' => $post->post_date,
 					'permalink' => get_permalink( $post->ID ),
 					'thumbnail' => has_post_thumbnail($post->ID) ? get_the_post_thumbnail($post->ID, 'thumbnail') : '',
+					'post' => $post,
 				);
 		}
 		header('Content-Type: application/json; charset=utf-8');
