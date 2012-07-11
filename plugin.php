@@ -40,6 +40,8 @@ class my_clip {
 			add_action( 'the_content', array(&$this, 'add_clip') );
 			add_action( 'wp_enqueue_scripts', array(&$this,'add_scripts') );
 			add_action( 'wp_footer', array(&$this,'footer_scripts') );
+			add_action( 'wp_ajax_nlmg_clip_search', array(&$this, 'clip_search') );
+			add_action( 'wp_ajax_nopriv_clip_search', array(&$this, 'clip_search') );
 		}
 	}
 
@@ -56,8 +58,9 @@ jQuery(function($){
     var clips = $.cookie('".self::COOKIE_KEY."');
     var id=$(this).attr('id').replace('clip-','');
     var regexp = new RegExp('\"' + id + '\"');
-    if ( !clips || !clips.match(regexp) )
+    if ( !clips || !clips.match(regexp) ) {
       clips = (clips ? clips + ',' : '') + '\"' + id + '\"';
+    }
     $.cookie('".self::COOKIE_KEY."', clips, 7);
 
     alert(clips);
@@ -75,6 +78,19 @@ jQuery(function($){
 			$id
 			);
 		return $icon . $content;
+	}
+	
+	public function clip_search() {
+		$post_ids = isset($_COOKIE[self::COOKIE_KEY]) ? explode(',',$_COOKIE[self::COOKIE_KEY]) : array();
+		$result = array();
+		foreach ( $post_ids as $post_id ) {
+			$post_id = intval(preg_replace('/[^0-9]/', '', $post_id));
+			if ($post = get_post( $post_id ))
+				$result[] = $post;
+		}
+		header('Content-Type: application/json; charset=utf-8');
+		echo json_encode($result);
+	    die();
 	}
 }
 
