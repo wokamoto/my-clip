@@ -83,13 +83,18 @@ jQuery(function($){
       }
     });
   }
-
-  $('.my-clip').unbind('click').click(function(){
-    var clips = $.cookie('$cookie_key');
-    var id=$(this).attr('id').replace('clip-','');
+  
+  function clipped(obj){
+    var clips_org = $.cookie('$cookie_key');
+    var clips = clips_org;
+    var id = obj.attr('id').replace('clip-','');
     var regexp = new RegExp('\"' + id + '\"');
-    if ( !clips || !clips.match(regexp) ) {
+    if ( !clips.match(regexp) ) {
       clips = '\"' + id + '\"' + (clips ? ',' + clips : '');
+    } else {
+      clips = clips.replace(regexp, '').replace(',,','');
+    }
+    if ( clips !== clips_org ) {
       $.cookie('$cookie_key', clips, $cookie_expire);
       $.ajax({
         type: 'GET',
@@ -98,7 +103,9 @@ jQuery(function($){
         success: clip_set,
       });
     }
-  });
+  }
+
+  $('.my-clip').unbind('click').click(function(){clipped($(this));});
   
   function clip_set(data, dataType){
     $('.my-clip_wrap').each(function(){
