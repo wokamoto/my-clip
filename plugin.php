@@ -245,7 +245,7 @@ class MyClipWidget extends WP_Widget {
 		if ( !empty($title) )
 			echo $before_title . $title . $after_title;
 		printf(
-			'<div class="my-clip_wrap limit-%1$d"><p><a href="#" class="more-clip">%2$s</a></p></div>' . "\n",
+			'<div class="my-clip_wrap limit-%1$d"><ul></ul><p><a href="#" class="more-clip" style="display:none">%2$s</a></p></div>' . "\n",
 			intval($instance['limit']) ,
 			'すべて表示'
 			);
