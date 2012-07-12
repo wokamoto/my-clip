@@ -64,6 +64,8 @@ class MyClip {
         echo "<script>\n";
         echo <<<EOT
 jQuery(function($){
+  var initialized = false;
+
   if ( $.cookie('$cookie_key') ) {
     $.ajax({
       type: 'GET',
@@ -128,9 +130,14 @@ jQuery(function($){
         var li = $('<li id="my-clip-post-' + this.id + '"></li>')
           .append('<a href="' + this.permalink + '">' + this.title + '</a> <a href="#" class="my-clip-remove" id="clipped-' + this.id + '">x</a>');
         count++;
-        if ( count > limit[1] && $('.more-clip', $(this)).css('display') === 'none' ) {
-          li.hide();
-          moreclip = true;
+        if ( count > limit[1] ) {
+          if ( initialized && $('.more-clip', $(this)).css('display') === 'none' )
+            li.hide();
+            moreclip = true;
+          } else {
+            li.hide();
+            moreclip = true;
+          }
         }
         ul.append(li);
       });
@@ -145,6 +152,7 @@ jQuery(function($){
       $('.my-clip-remove').unbind('click').click(function(){clipped($(this));return false;});
     });
     set_clipped_text();
+    initialized = true;
   }
 });
 EOT;
