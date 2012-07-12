@@ -30,6 +30,7 @@ License:
 class MyClip {
 	const COOKIE_KEY = 'my_clip';
 	const COOKIE_EXPIRES = 7;
+	private $clip_text = array();
 
 	function __construct() {
 		if ( !is_admin() ) {
@@ -44,6 +45,8 @@ class MyClip {
 
 		// register widget
 		add_action('widgets_init', array(&$this, 'register_widget'));
+		
+		$this->set_clip_text('クリップする', 'クリップ済み');
 	}
 
 	public function add_scripts() {
@@ -55,8 +58,8 @@ class MyClip {
 		$ajax_url = admin_url('admin-ajax.php') . '?action=clip_search';
 		$cookie_key = self::COOKIE_KEY;
 		$cookie_expire = self::COOKIE_EXPIRES;
-		$clip_text = 'クリップする';
-		$clipped_text = 'クリップ済み';
+		$clip_text = $this->clip_text[0];
+		$clipped_text = $this->clip_text[1];
 
         echo "<script>\n";
         echo <<<EOT
@@ -137,18 +140,21 @@ EOT;
 	}
 	
 	public function add_clip($content) {
-		$id = get_the_ID();
-		//$icon = sprintf(
-		//	'<img src="%s" width="32" height="28" id="clip-%d" class="clip_icon alignright">',
-		//	plugins_url('/images/clip_1.png', __FILE__),
-		//	$id
-		//	);
+		return $icon . $this->clip_icon(get_the_ID());
+	}
+
+	public function set_clip_text($clip_text, $clipped_text) {
+		$this->clip_text = array($clip_text, $clipped_text);
+	}
+
+	public function clip_icon($id, $before = '', $after = '') {
 		$icon = sprintf(
-			'<div class="clip_icon alignright"><a href="#" id="clip-%d" class="my-clip">%s</a></div>',
+			'<div class="clip_icon alignright">%s<a href="#" id="clip-%d" class="my-clip">%s</a>%s</div>',
+			$before ,
 			$id ,
-			'クリップする'
+			$this->clip_text[0] ,
+			$after
 			);
-		return $icon . $content;
 	}
 	
 	private function clip_posts_id(){
@@ -256,6 +262,26 @@ class MyClipWidget extends WP_Widget {
 endif;
 
 /******************************************************************************
+ * functions
+ *****************************************************************************/
+function init_my_clip_text($clip_text, $clipped_text){
+	global $my_clip;
+	
+	if (!isset($my_clip))
+		$my_clip = New MyClip();
+	echo $my_clip->set_clip_text($clip_text, $clipped_text);
+}
+
+function my_clip($post_id, $before = '', $after = ''){
+	global $my_clip;
+	
+	if (!isset($my_clip))
+		$my_clip = New MyClip();
+	echo $my_clip->clip_icon($post_id, $before, $after);
+}
+
+/******************************************************************************
  * Go Go Go!
  *****************************************************************************/
-New MyClip();
+global $my_clip;
+$my_clip = New MyClip();
