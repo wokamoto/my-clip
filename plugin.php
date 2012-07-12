@@ -105,7 +105,7 @@ jQuery(function($){
     }
   }
 
-  $('.my-clip').unbind('click').click(function(){clipped($(this));});
+  $('.my-clip').unbind('click').click(function(){clipped($(this));return false;});
   
   function clip_set(data, dataType){
     $('.my-clip_wrap').each(function(){
