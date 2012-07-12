@@ -34,7 +34,7 @@ class MyClip {
 
 	function __construct() {
 		if ( !is_admin() ) {
-			add_filter('the_content', array(&$this, 'add_clip'));
+			add_filter('get_the_content', array(&$this, 'add_clip'));
 			add_action('wp_enqueue_scripts', array(&$this,'add_scripts'));
 			add_action('wp_footer', array(&$this,'footer_scripts'));
 		}
