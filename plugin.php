@@ -112,6 +112,11 @@ jQuery(function($){
   }
 
   $('.my-clip').unbind('click').click(function(){clipped($(this));return false;});
+
+  $('.more-clip').unbind('click').click(function(){
+    $(this).hide().prev('ul').children('li').show();
+    return false;
+  });
   
   function clip_set(data, dataType){
     $('.my-clip_wrap').each(function(){
@@ -123,7 +128,7 @@ jQuery(function($){
         var li = $('<li id="my-clip-post-' + this.id + '"></li>')
           .append('<a href="' + this.permalink + '">' + this.title + '</a> <a href="#" class="my-clip-remove" id="clipped-' + this.id + '">x</a>');
         count++;
-        if ( count > limit[1] ) {
+        if ( count > limit[1] && $('.more-clip', $(this)).css('display') === 'none' ) {
           li.hide();
           moreclip = true;
         }
@@ -236,7 +241,7 @@ class MyClipWidget extends WP_Widget {
 		if ( !empty($title) )
 			echo $before_title . $title . $after_title;
 		printf(
-			'<div class="my-clip_wrap limit-%1$d"><a href="#" class="more-clip" style="display:none">%2$s</a></div>' . "\n",
+			'<div class="my-clip_wrap limit-%1$d"><p><a href="#" class="more-clip" style="display:none">%2$s</a></p></div>' . "\n",
 			intval($instance['limit']) ,
 			'すべて表示'
 			);
