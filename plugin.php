@@ -127,11 +127,12 @@ jQuery(function($){
       var count = 0;
       var ul = $('<ul></ul>');
       var moreclip = false;
+      var hideclip = $(this)).css('display') !== 'none';
       $.each(data, function(){
         var li = $('<li id="my-clip-post-' + this.id + '"></li>')
           .append('<a href="' + this.permalink + '">' + this.title + '</a> <a href="#" class="my-clip-remove" id="clipped-' + this.id + '">x</a>');
         count++;
-        if ( count > limit[1] && $('.more-clip', $(this)).css('display') !== 'none' ) {
+        if ( count > limit[1] && hideclip ) {
           li.hide();
           moreclip = true;
         }
