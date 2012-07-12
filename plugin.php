@@ -131,7 +131,7 @@ jQuery(function($){
           .append('<a href="' + this.permalink + '">' + this.title + '</a> <a href="#" class="my-clip-remove" id="clipped-' + this.id + '">x</a>');
         count++;
         if ( count > limit[1] ) {
-          if ( initialized && $('.more-clip', $(this)).css('display') === 'none' )
+          if ( initialized && $('.more-clip', $(this)).css('display') === 'none' ) {
             li.hide();
             moreclip = true;
           } else {
