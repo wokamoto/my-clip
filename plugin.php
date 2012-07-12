@@ -116,7 +116,8 @@ jQuery(function($){
   $('.my-clip').unbind('click').click(function(){clipped($(this));return false;});
 
   $('.more-clip').unbind('click').click(function(){
-    $(this).hide().prev('ul').children('li').show();
+    $(this).hide()
+      .parent().prev('ul').children('li').show();
     return false;
   });
   
