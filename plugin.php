@@ -77,9 +77,9 @@ jQuery(function($){
       var id=$(this).attr('id').replace('clip-','');
       var regexp = new RegExp('\"' + id + '\"');
       if ( !clips || !clips.match(regexp) ) {
-        $(this).html('$clip_text');
+        $(this).addClass('clipped').html('$clip_text');
       } else {
-        $(this).html('$clipped_text');
+        $(this).removeClass('clipped').html('$clipped_text');
       }
     });
   }
