@@ -4,7 +4,7 @@ Plugin Name: My Clip
 Plugin URI: 
 Description: 
 Author: wokamoto
-Version: 0.0.1
+Version: 0.0.2
 Author URI: http://dogmap.jp/
 
 License:
@@ -156,8 +156,8 @@ EOT;
 	}
 	
 	public function add_clip($content) {
-		if ( !is_feed() )
-			return $this->clip_icon(get_the_ID()) . $content;
+		if ( !is_feed() && $id = get_the_ID() && !empty($content) )
+			return $this->clip_icon($id) . $content;
 		else
 			return $content;
 	}
