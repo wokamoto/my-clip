@@ -156,8 +156,8 @@ EOT;
 	}
 	
 	public function add_clip($content) {
-		if ( !is_feed() && $id = get_the_ID() && !empty($content) )
-			return $this->clip_icon($id) . $content;
+		if ( !is_feed() && !empty($content) )
+			return $this->clip_icon(get_the_ID()) . $content;
 		else
 			return $content;
 	}
