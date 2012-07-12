@@ -64,7 +64,7 @@ jQuery(function($){
   if ( $.cookie('$cookie_key') ) {
     $.ajax({
       type: 'GET',
-      url: '$ajax_url',
+      url: '$ajax_url&posts=' + $.cookie('$cookie_key').replace('"',''),
       dataType: 'json',
       success: clip_set,
     });
@@ -101,7 +101,7 @@ jQuery(function($){
       $.cookie('$cookie_key', clips, $cookie_expire);
       $.ajax({
         type: 'GET',
-        url: '$ajax_url',
+        url: '$ajax_url&posts=' + clips.replace('"',''),
         dataType: 'json',
         success: clip_set,
       });
