@@ -160,7 +160,7 @@ EOT;
 		$results = array();
 		foreach ( $post_ids as $post_id ) {
 			$post_id = intval(preg_replace('/[^0-9]/', '', $post_id));
-			$transient_key = 'my_clip-'.$post_id;
+			$transient_key = 'my_clip-tran-'.$post_id;
 			if ( $result = get_transient($transient_key) ) {
 				$results[] = $result;
 			} else if ( $post = get_post($post_id) || $post = get_page($post_id) ) {
