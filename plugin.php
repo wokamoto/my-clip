@@ -98,7 +98,7 @@ jQuery(function($){
       clips = '"' + id + '"';
     }
     if ( clips !== clips_org ) {
-      $.cookie('$cookie_key', clips, $cookie_expire);
+      $.cookie('$cookie_key', clips, { expires: $cookie_expire, path: '/' });
       $.ajax({
         type: 'GET',
         url: '$ajax_url&posts=' + clips.replace(/"/g,''),
