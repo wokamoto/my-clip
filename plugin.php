@@ -163,7 +163,7 @@ EOT;
 			$transient_key = 'my_clip-'.$post_id;
 			if ( $result = get_transient($transient_key) ) {
 				$results[] = $result;
-			} else if ( $post = get_post($post_id) ) {
+			} else if ( $post = get_post($post_id) || $post = get_page($post_id) ) {
 				$result = array(
 					'id' => $post->ID,
 					'title' => $post->post_title,
