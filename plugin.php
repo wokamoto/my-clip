@@ -64,8 +64,6 @@ class MyClip {
         echo "<script>\n";
         echo <<<EOT
 jQuery(function($){
-  var initialized = false;
-
   if ( $.cookie('$cookie_key') ) {
     $.ajax({
       type: 'GET',
@@ -146,10 +144,9 @@ jQuery(function($){
         $('.more-clip', $(this)).show();
       else
         $('.more-clip', $(this)).hide();
-      if ( !initialized && count <= limit[1] )
+      if ( $('li', $(this)).length <= limit[1] )
         $('.more-clip', $(this)).hide();
       $('.my-clip-remove').unbind('click').click(function(){clipped($(this));return false;});
-      initialized = true;
     });
     set_clipped_text();
   }
