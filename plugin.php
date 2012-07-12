@@ -88,10 +88,14 @@ jQuery(function($){
     var clips_org = $.cookie('$cookie_key');
     var clips = clips_org;
     var id = obj.attr('id').replace(/(clip|clipped)-/,'');
-    if ( !clips.match(new RegExp('"' + id + '"')) ) {
-      clips = '"' + id + '"' + (clips ? ',' + clips : '');
+    if ( clips ) {
+      if ( !clips.match(new RegExp('"' + id + '"')) ) {
+        clips = '"' + id + '"' + (clips ? ',' + clips : '');
+      } else {
+        clips = clips.replace('"' + id + '"', '').replace(',,','');
+      }
     } else {
-      clips = clips.replace('"' + id + '"', '').replace(',,','');
+      clips = '"' + id + '"';
     }
     if ( clips !== clips_org ) {
       $.cookie('$cookie_key', clips, $cookie_expire);
