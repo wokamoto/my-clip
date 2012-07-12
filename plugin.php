@@ -74,12 +74,12 @@ jQuery(function($){
   function set_clipped_text() {
     $('.my-clip').each(function(){
       var clips = $.cookie('$cookie_key');
-      var id=$(this).attr('id').replace('clip-','');
+      var id = $(this).attr('id').replace('clip-','');
       var regexp = new RegExp('\"' + id + '\"');
       if ( !clips || !clips.match(regexp) ) {
-        $(this).addClass('clipped').html('$clip_text');
+        $(this).removeClass('clipped').html('$clip_text');
       } else {
-        $(this).removeClass('clipped').html('$clipped_text');
+        $(this).addClass('clipped').html('$clipped_text');
       }
     });
   }
