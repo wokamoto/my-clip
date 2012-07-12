@@ -133,7 +133,7 @@ EOT;
 		//	$id
 		//	);
 		$icon = sprintf(
-			'<div class="clip_icon alignright"><a href="#" id="clip-%d" class="my-clip">%s</a>',
+			'<div class="clip_icon alignright"><a href="#" id="clip-%d" class="my-clip">%s</a></div>',
 			$id ,
 			'クリップする'
 			);
