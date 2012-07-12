@@ -92,7 +92,7 @@ jQuery(function($){
       if ( !clips.match(new RegExp('"' + id + '"')) ) {
         clips = '"' + id + '"' + (clips ? ',' + clips : '');
       } else {
-        clips = clips.replace('"' + id + '"', '').replace(',,',',');
+        clips = clips.replace('"' + id + '"', '').replace(',,',',').replace(/,$/,'').replace(/^,/,'');
       }
     } else {
       clips = '"' + id + '"';
