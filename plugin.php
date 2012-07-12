@@ -53,29 +53,47 @@ class MyClip {
 	
 	public function footer_scripts() {
 		$ajax_url = admin_url('admin-ajax.php') . '?action=clip_search';
+		$cookie_key = self::COOKIE_KEY;
+		$cookie_expire = self::COOKIE_EXPIRES;
+		$clip_text = 'クリップする';
+		$clipped_text = 'クリップ済み';
 
         echo "<script>\n";
-        echo "
+        echo <<<EOT
 jQuery(function($){
-  if ( $.cookie('".self::COOKIE_KEY."') ) {
+  if ( $.cookie('$cookie_key') ) {
     $.ajax({
       type: 'GET',
-      url: '".$ajax_url."',
+      url: '$ajax_url',
       dataType: 'json',
       success: clip_set,
     });
   }
+  set_clipped_text();
 
-  $('.clip_icon').unbind('click').click(function(){
-    var clips = $.cookie('".self::COOKIE_KEY."');
+  function set_clipped_text() {
+    $('.my-clip').each(function(){
+      var clips = $.cookie('$cookie_key');
+      var id=$(this).attr('id').replace('clip-','');
+      var regexp = new RegExp('\"' + id + '\"');
+      if ( !clips || !clips.match(regexp) ) {
+        $(this).html('$clip_text');
+      } else {
+        $(this).html('$clipped_text');
+      }
+    });
+  }
+
+  $('.my-clip').unbind('click').click(function(){
+    var clips = $.cookie('$cookie_key');
     var id=$(this).attr('id').replace('clip-','');
     var regexp = new RegExp('\"' + id + '\"');
     if ( !clips || !clips.match(regexp) ) {
       clips = '\"' + id + '\"' + (clips ? ',' + clips : '');
-      $.cookie('".self::COOKIE_KEY."', clips, 7);
+      $.cookie('$cookie_key', clips, $cookie_expire);
       $.ajax({
         type: 'GET',
-        url: '".$ajax_url."',
+        url: '$ajax_url',
         dataType: 'json',
         success: clip_set,
       });
@@ -88,7 +106,8 @@ jQuery(function($){
       var count = 0;
       var ul = $('<ul></ul>');
       $.each(data, function(){
-        var li = $('<li id=\"my-clip-post-' + this.id + '\"></li>').append('<a href=\"' + this.permalink + '\">' + this.title + '</a>');
+        var li = $('<li id="my-clip-post-' + this.id + '"></li>')
+          .append('<a href="' + this.permalink + '">' + this.title + '</a>');
         count++;
         if ( count > limit[1] )
           li.hide();
@@ -99,29 +118,42 @@ jQuery(function($){
       }
       $('ul', $(this)).replaceWith(ul);
     });
+    set_clipped_text();
   }
 });
-";
+EOT;
         echo "</script>\n";
 	}
 	
 	public function add_clip($content) {
 		$id = get_the_ID();
+		//$icon = sprintf(
+		//	'<img src="%s" width="32" height="28" id="clip-%d" class="clip_icon alignright">',
+		//	plugins_url('/images/clip_1.png', __FILE__),
+		//	$id
+		//	);
 		$icon = sprintf(
-			'<img src="%s" width="32" height="28" id="clip-%d" class="clip_icon alignright">',
-			plugins_url('/images/clip_1.png', __FILE__),
-			$id
+			'<div class="clip_icon alignright"><a href="#" id="clip-%d" class="my-clip">%s</a>',
+			$id ,
+			'クリップする'
 			);
 		return $icon . $content;
 	}
 	
-	public function clip_search() {
-		$post_ids = isset($_COOKIE[self::COOKIE_KEY]) ? explode(',',$_COOKIE[self::COOKIE_KEY]) : array();
-		$result = array();
+	private function clip_posts_id(){
+		return isset($_COOKIE[self::COOKIE_KEY]) ? explode(',',$_COOKIE[self::COOKIE_KEY]) : array();
+	}
+	
+	private function clip_posts(){
+		$post_ids = $this->clip_posts_id();
+		$results = array();
 		foreach ( $post_ids as $post_id ) {
 			$post_id = intval(preg_replace('/[^0-9]/', '', $post_id));
-			if ($post = get_post( $post_id ))
-				$result[] = array(
+			$transient_key = 'my_clip-'.$post_id;
+			if ( $result = get_transient($transient_key) ) {
+				$results[] = $result;
+			} else if ( $post = get_post($post_id) ) {
+				$result = array(
 					'id' => $post->ID,
 					'title' => $post->post_title,
 					'date' => $post->post_date,
@@ -129,9 +161,16 @@ jQuery(function($){
 					'thumbnail' => has_post_thumbnail($post->ID) ? get_the_post_thumbnail($post->ID, 'thumbnail') : '',
 					//'post' => $post,
 				);
+				set_transient($transient_key, $result, self::COOKIE_EXPIRES * 24 * 60 * 60 );
+				$results[] = $result;
+			}
 		}
+		return $results;
+	}
+	
+	public function clip_search() {
 		header('Content-Type: application/json; charset=utf-8');
-		echo json_encode($result);
+		echo json_encode($this->clip_posts());
 	    die();
 	}
 
@@ -142,7 +181,7 @@ jQuery(function($){
 }
 
 /******************************************************************************
- * CommentersWidgetController Class ( for WP2.8+ )
+ * MyClipWidget Class ( for WP2.8+ )
  *****************************************************************************/
 if ( class_exists('WP_Widget') ) :
 
