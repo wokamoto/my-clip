@@ -34,7 +34,7 @@ class MyClip {
 
 	function __construct() {
 		if ( !is_admin() ) {
-			add_action('the_content', array(&$this, 'add_clip'));
+			add_filter('the_content', array(&$this, 'add_clip'));
 			add_action('wp_enqueue_scripts', array(&$this,'add_scripts'));
 			add_action('wp_footer', array(&$this,'footer_scripts'));
 		}
@@ -156,7 +156,10 @@ EOT;
 	}
 	
 	public function add_clip($content) {
-		return $this->clip_icon(get_the_ID()) . $content;
+		if ( !is_feed() )
+			return $this->clip_icon(get_the_ID()) . $content;
+		else
+			return $content;
 	}
 
 	public function set_clip_text($clip_text, $clipped_text) {
