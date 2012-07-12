@@ -118,22 +118,22 @@ jQuery(function($){
       var limit = $(this).attr('class').match(/limit-([0-9]+)/i);
       var count = 0;
       var ul = $('<ul></ul>');
-      var more = false;
+      var moreclip = false;
       $.each(data, function(){
         var li = $('<li id="my-clip-post-' + this.id + '"></li>')
           .append('<a href="' + this.permalink + '">' + this.title + '</a> <a href="#" class="my-clip-remove" id="clipped-' + this.id + '">x</a>');
         count++;
         if ( count > limit[1] ) {
           li.hide();
-          more = true;
+          moreclip = true;
         }
         ul.append(li);
       });
       if ( $('ul', $(this)).length <= 0 ) {
-        $(this).append('<ul></ul>');
+        $(this).prepend('<ul></ul>');
       }
       $('ul', $(this)).replaceWith(ul);
-      if ( more )
+      if ( moreclip )
         $('.more-clip', $(this)).show();
       else
         $('.more-clip', $(this)).hide();
