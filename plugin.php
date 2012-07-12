@@ -118,18 +118,25 @@ jQuery(function($){
       var limit = $(this).attr('class').match(/limit-([0-9]+)/i);
       var count = 0;
       var ul = $('<ul></ul>');
+      var more = false;
       $.each(data, function(){
         var li = $('<li id="my-clip-post-' + this.id + '"></li>')
           .append('<a href="' + this.permalink + '">' + this.title + '</a> <a href="#" class="my-clip-remove" id="clipped-' + this.id + '">x</a>');
         count++;
-        if ( count > limit[1] )
+        if ( count > limit[1] ) {
           li.hide();
+          more = true;
+        }
         ul.append(li);
       });
       if ( $('ul', $(this)).length <= 0 ) {
         $(this).append('<ul></ul>');
       }
       $('ul', $(this)).replaceWith(ul);
+      if ( more )
+        ul.next('.more-clip').show();
+      else
+        ul.next('.more-clip').hide();
       $('.my-clip-remove').unbind('click').click(function(){clipped($(this));return false;});
     });
     set_clipped_text();
@@ -222,14 +229,18 @@ class MyClipWidget extends WP_Widget {
 	public function widget( $args, $instance ) {
 		extract($args);
 		$title = apply_filters('widget_title', 
-				isset($instance['title']) ? trim($instance['title']) : '' ,
-				$instance ,
-				$this->id_base);
-        echo $before_widget;
-        if ( !empty($title) )
-            echo $before_title . $title . $after_title;
-        printf('<div class="my-clip_wrap limit-%d"></div>' . "\n", intval($instance['limit']));
-        echo $after_widget;
+			isset($instance['title']) ? trim($instance['title']) : '' ,
+			$instance ,
+			$this->id_base);
+		echo $before_widget;
+		if ( !empty($title) )
+			echo $before_title . $title . $after_title;
+		printf(
+			'<div class="my-clip_wrap limit-%1$d"><a href="#" class="more-clip" style="display:none">%2$s</a></div>' . "\n",
+			intval($instance['limit']) ,
+			'すべて表示'
+			);
+		echo $after_widget;
 	}
 
 	public function update( $new_instance, $old_instance ) {
