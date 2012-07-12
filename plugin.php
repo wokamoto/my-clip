@@ -64,7 +64,7 @@ jQuery(function($){
   if ( $.cookie('$cookie_key') ) {
     $.ajax({
       type: 'GET',
-      url: '$ajax_url&posts=' + $.cookie('$cookie_key').replace('"',''),
+      url: '$ajax_url&posts=' + $.cookie('$cookie_key').replace(/"/g,''),
       dataType: 'json',
       success: clip_set,
     });
@@ -101,7 +101,7 @@ jQuery(function($){
       $.cookie('$cookie_key', clips, $cookie_expire);
       $.ajax({
         type: 'GET',
-        url: '$ajax_url&posts=' + clips.replace('"',''),
+        url: '$ajax_url&posts=' + clips.replace(/"/g,''),
         dataType: 'json',
         success: clip_set,
       });
@@ -152,7 +152,13 @@ EOT;
 	}
 	
 	private function clip_posts_id(){
-		return isset($_COOKIE[self::COOKIE_KEY]) ? explode(',',$_COOKIE[self::COOKIE_KEY]) : array();
+		if ( isset($_GET['posts'])) {
+			return (array)explode(',',$_GET['posts']);
+		} else if ( isset($_COOKIE[self::COOKIE_KEY]) ) {
+			return explode(',',$_COOKIE[self::COOKIE_KEY]);
+		} else {
+			return array();
+		}
 	}
 	
 	private function clip_posts(){
