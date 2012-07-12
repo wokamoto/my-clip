@@ -134,9 +134,9 @@ jQuery(function($){
       }
       $('ul', $(this)).replaceWith(ul);
       if ( more )
-        ul.next('.more-clip').show();
+        $('.more-clip', $(this)).show();
       else
-        ul.next('.more-clip').hide();
+        $('.more-clip', $(this)).hide();
       $('.my-clip-remove').unbind('click').click(function(){clipped($(this));return false;});
     });
     set_clipped_text();
