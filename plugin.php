@@ -140,7 +140,7 @@ EOT;
 	}
 	
 	public function add_clip($content) {
-		return $icon . $this->clip_icon(get_the_ID());
+		return $this->clip_icon(get_the_ID()) . $content;
 	}
 
 	public function set_clip_text($clip_text, $clipped_text) {
