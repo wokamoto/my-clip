@@ -148,7 +148,7 @@ EOT;
 	}
 
 	public function clip_icon($id, $before = '', $after = '') {
-		$icon = sprintf(
+		return sprintf(
 			'<div class="clip_icon alignright">%s<a href="#" id="clip-%d" class="my-clip">%s</a>%s</div>',
 			$before ,
 			$id ,
