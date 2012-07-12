@@ -87,7 +87,7 @@ jQuery(function($){
   function clipped(obj){
     var clips_org = $.cookie('$cookie_key');
     var clips = clips_org;
-    var id = obj.attr('id').replace('clip-','');
+    var id = obj.attr('id').replace(/(clip|clipped)-/,'');
     var regexp = new RegExp('\"' + id + '\"');
     if ( !clips.match(regexp) ) {
       clips = '\"' + id + '\"' + (clips ? ',' + clips : '');
@@ -106,6 +106,7 @@ jQuery(function($){
   }
 
   $('.my-clip').unbind('click').click(function(){clipped($(this));return false;});
+  $('.my-clip-remove').unbind('click').click(function(){clipped($(this));return false;});
   
   function clip_set(data, dataType){
     $('.my-clip_wrap').each(function(){
@@ -114,7 +115,7 @@ jQuery(function($){
       var ul = $('<ul></ul>');
       $.each(data, function(){
         var li = $('<li id="my-clip-post-' + this.id + '"></li>')
-          .append('<a href="' + this.permalink + '">' + this.title + '</a>');
+          .append('<a href="' + this.permalink + '">' + this.title + '</a> <a href="#" class="my-clip-remove" id="clipped-' + this.id + '">X</a>');
         count++;
         if ( count > limit[1] )
           li.hide();
