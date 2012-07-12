@@ -162,11 +162,12 @@ EOT;
 			$post_id = intval(preg_replace('/[^0-9]/', '', $post_id));
 			//$transient_key = 'my_clip-tran-'.$post_id;
 			//if ( $result = get_transient($transient_key) ) {
-				$results[] = $result;
+			//	$results[] = $result;
 			//} else
-			 if ( $post = get_post($post_id) || $post = get_page($post_id) ) {
+			 if ( $post = get_post($post_id) ) {
 				$result = array(
 					'id' => $post->ID,
+					'type' => $post->post_type,
 					'title' => $post->post_title,
 					'date' => $post->post_date,
 					'permalink' => get_permalink($post->ID),
