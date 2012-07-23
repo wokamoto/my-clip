@@ -1,10 +1,10 @@
 <?php
 /*
-Plugin Name: My Clip
+Plugin Name: My Clipping
 Plugin URI: 
 Description: 
 Author: wokamoto
-Version: 0.0.2
+Version: 0.1.0
 Author URI: http://dogmap.jp/
 
 License:
@@ -127,8 +127,12 @@ jQuery(function($){
       var moreclip = false;
       var hideclip = $('.more-clip', $(this)).css('display') !== 'none' || $('li', $(this)).length <= limit[1];
       $.each(data, function(){
-        var li = $('<li id="my-clip-post-' + this.id + '"></li>')
-          .append('<a href="' + this.permalink + '">' + this.title + '</a> <a href="#" class="my-clip-remove" id="clipped-' + this.id + '">x</a>');
+        var li = $('<li id="my-clip-post-' + this.id + '"></li>');
+        var thumb = $('<div class="thumbnail"><img src="' + this.thumbnail + '"></div>');
+        var content = $('<div class="content"></div>')
+          .append('<a href="' + this.permalink + '" class="clip-link">' + this.title + '</a><br>' + this.excerpt);
+        var remove = $('<div class="del-link"><a href="#" class="my-clip-remove" id="clipped-' + this.id + '">x</a></div>');
+        li.append(thumb).append(content).append(remove);
         count++;
         if ( count > limit[1] && hideclip ) {
           li.hide();
@@ -186,26 +190,103 @@ EOT;
 		}
 	}
 	
+	// get the thumbnail
+	private function get_the_thumbnail($post) {
+		$thumb = '';
+		if ( is_numeric($post) ) {
+			$post_id = $post;
+			$post = get_post($post_id);
+		} else if ( is_object($post) && isset($post->ID) ) {
+			$post_id = $post->ID;
+		} else {
+			return $thumb;
+		}
+	
+		if ( function_exists('has_post_thumbnail') && has_post_thumbnail($post_id) ) {
+			$thumb = preg_replace("/^.*['\"](https?:\/\/[^'\"]*)['\"].*/i","$1", get_the_post_thumbnail($post_id, 'thumbnail'));
+		} else {
+			$attachments = get_children(array(
+				'post_parent' => $post_id ,
+				'post_type' => 'attachment' ,
+				'post_mime_type' => 'image' ,
+				'orderby' => 'menu_order' ,
+				));
+			foreach ($attachments as $attachment) {
+				$image_src = wp_get_attachment_image_src($attachment->ID);
+				$thumb = (isset($image_src[0]) ? $image_src[0] : '');
+				unset($image_src);
+				break;
+			}
+			unset($attachments);
+		}
+		if (empty($thumb) && preg_match_all('/<img .*src=[\'"]([^\'"]+)[\'"]/', $post->post_content, $matches, PREG_SET_ORDER)) {
+			$thumb = $matches[0][1];
+		}
+		unset($matches);
+		
+		return $thumb;
+	}
+
+	// get the excerpt
+	private function get_the_excerpt($post){
+		global $wpmp_conf;
+
+		$excerpt = '';
+		if ( is_numeric($post) ) {
+			$post_id = $post;
+			$post = get_post($post_id);
+		} else if ( is_object($post) && isset($post->ID) ) {
+			$post_id = $post->ID;
+		} else {
+			return $excerpt;
+		}
+
+		$excerpt =
+			!post_password_required($post)
+			? get_the_excerpt()
+			: __('There is no excerpt because this is a protected post.');
+		if (empty($excerpt)) {
+			$strwidth = (
+				isset($wpmp_conf["excerpt_mblength"])
+				? $wpmp_conf["excerpt_mblength"]
+				: 255
+				);
+			$excerpt = trim(preg_replace(
+				array('/[\n\r]/', '/\[[^\]]+\]/'),
+				array('', ' '),
+				strip_tags($post->post_content)
+				));
+			$excerpt = (
+				function_exists('mb_strimwidth')
+				? mb_strimwidth($excerpt, 0, $strwidth, '...', get_option('blog_charset'))
+				: ( strlen($excerpt) > $strwidth ? substr($excerpt, 0, $strwidth - 3) . '...' : $excerpt)
+				);
+			$excerpt = apply_filters('get_the_excerpt', $excerpt);
+		}
+		
+		return $excerpt;
+	}
+
 	private function clip_posts(){
 		$post_ids = $this->clip_posts_id();
 		$results = array();
 		foreach ( $post_ids as $post_id ) {
 			$post_id = intval(preg_replace('/[^0-9]/', '', $post_id));
-			//$transient_key = 'my_clip-tran-'.$post_id;
-			//if ( $result = get_transient($transient_key) ) {
-			//	$results[] = $result;
-			//} else
-			 if ( $post = get_post($post_id) ) {
+			$transient_key = 'my_clip-tran-'.$post_id;
+			if ( $result = get_transient($transient_key) ) {
+				$results[] = $result;
+			} else if ( $post = get_post($post_id) ) {
 				$result = array(
 					'id' => $post->ID,
 					'type' => $post->post_type,
 					'title' => $post->post_title,
 					'date' => $post->post_date,
 					'permalink' => get_permalink($post->ID),
-					'thumbnail' => has_post_thumbnail($post->ID) ? get_the_post_thumbnail($post->ID, 'thumbnail') : '',
+					'thumbnail' => $this->get_the_thumbnail($post),
+					'excerpt' => $this->get_the_excerpt($post),
 					//'post' => $post,
 				);
-			//	set_transient($transient_key, $result, self::COOKIE_EXPIRES * 24 * 60 * 60 );
+				set_transient($transient_key, $result, 5 * 60 );	// 5min * 60sec
 				$results[] = $result;
 			}
 		}
