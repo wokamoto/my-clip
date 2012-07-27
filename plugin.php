@@ -4,7 +4,7 @@ Plugin Name: My Clipping
 Plugin URI: 
 Description: 
 Author: wokamoto
-Version: 0.1.0
+Version: 0.2.0
 Author URI: http://dogmap.jp/
 
 License:
@@ -51,7 +51,7 @@ class MyClip {
 
 	public function add_scripts() {
 		wp_enqueue_script('jquery');
-		wp_enqueue_script('jquery.cookie', plugins_url('/js/jquery.cookie.js', __FILE__), array('jquery'), '1.1', true);
+		wp_enqueue_script('jquery.cookie', plugins_url('/js/jquery.cookie.min.js', __FILE__), array('jquery'), '1.1', true);
 	}
 	
 	public function footer_scripts() {
@@ -62,6 +62,10 @@ class MyClip {
 		$clipped_text = $this->clip_text[1];
 
         echo "<script>\n";
+        echo <<<EOT
+jQuery(function(a){function b(){a(".my-clip").each(function(){var b=a.cookie("$cookie_key");var c=a(this).attr("id").replace("clip-","");var d=new RegExp('"'+c+'"');if(!b||!b.match(d)){a(this).removeClass("clipped").html("$clip_text")}else{a(this).addClass("clipped").html("$clipped_text")}})}function c(b){var c=a.cookie("$cookie_key");var e=c;var f=b.attr("id").replace(/(clip|clipped)-/,"");if(e){if(!e.match(new RegExp('"'+f+'"'))){e='"'+f+'"'+(e?","+e:"")}else{e=e.replace('"'+f+'"',"").replace(",,",",").replace(/,$/,"").replace(/^,/,"")}}else{e='"'+f+'"'}if(e!==c){a.cookie("$cookie_key",e,{expires:$cookie_expire,path:"/"});a.ajax({type:"GET",url:"$ajax_url&posts="+e.replace(/"/g,""),dataType:"json",success:d})}}function d(d,e){a(".my-clip_wrap").each(function(){var b=a(this).attr("class").match(/limit-([0-9]+)/i);var e=0;var f=a("<ul></ul>");var g=false;var h=a(".more-clip",a(this)).css("display")!=="none"||a("li",a(this)).length<=b[1];a.each(d,function(){var c=a('<li id="my-clip-post-'+this.id+'"></li>');var d,i,j,k;d=a('<div class="thumbnail"></div>').append('<img src="'+this.thumbnail+'">');i="";a.each(this.categories,function(){i+=(i!==""?", ":"")+this});i=a('<div class="categories"></div>').append(i);j=a('<div class="content"></div>').append('<a href="'+this.permalink+'" class="clip-link">'+this.title+"</a><br>"+this.excerpt);k=a('<div class="del-link"></div>').append('<a href="#" class="my-clip-remove" id="clipped-'+this.id+'">x</a>');c.append(d).append(i).append(j).append(k);e++;if(e>b[1]&&h){c.hide();g=true}f.append(c)});if(a("ul",a(this)).length<=0){a(this).prepend("<ul></ul>")}a("ul",a(this)).replaceWith(f);if(g)a(".more-clip",a(this)).show();else a(".more-clip",a(this)).hide();if(a("li",a(this)).length<=b[1])a(".more-clip",a(this)).hide();a(".my-clip-remove").unbind("click").click(function(){c(a(this));return false})});b()}if(a.cookie("$cookie_key")){a.ajax({type:"GET",url:"$ajax_url&posts="+a.cookie("$cookie_key").replace(/"/g,""),dataType:"json",success:d})}b();a(".my-clip").unbind("click").click(function(){c(a(this));return false});a(".more-clip").unbind("click").click(function(){a(this).hide().parent().prev("ul").children("li").show();return false})});
+EOT;
+/*
         echo <<<EOT
 jQuery(function($){
   if ( $.cookie('$cookie_key') ) {
@@ -128,11 +132,20 @@ jQuery(function($){
       var hideclip = $('.more-clip', $(this)).css('display') !== 'none' || $('li', $(this)).length <= limit[1];
       $.each(data, function(){
         var li = $('<li id="my-clip-post-' + this.id + '"></li>');
-        var thumb = $('<div class="thumbnail"><img src="' + this.thumbnail + '"></div>');
-        var content = $('<div class="content"></div>')
+        var thumb, categories, content, remove;
+        thumb = $('<div class="thumbnail"></div>')
+          .append('<img src="' + this.thumbnail + '">');
+        categories = '';
+        $.each(this.categories, function(){
+          categories += (categories !== '' ? ', ' : '') + this;
+        });
+        categories = $('<div class="categories"></div>')
+          .append(categories);
+        content = $('<div class="content"></div>')
           .append('<a href="' + this.permalink + '" class="clip-link">' + this.title + '</a><br>' + this.excerpt);
-        var remove = $('<div class="del-link"><a href="#" class="my-clip-remove" id="clipped-' + this.id + '">x</a></div>');
-        li.append(thumb).append(content).append(remove);
+        remove = $('<div class="del-link"></div>')
+          .append('<a href="#" class="my-clip-remove" id="clipped-' + this.id + '">x</a>');
+        li.append(thumb).append(categories).append(content).append(remove);
         count++;
         if ( count > limit[1] && hideclip ) {
           li.hide();
@@ -156,6 +169,7 @@ jQuery(function($){
   }
 });
 EOT;
+*/
         echo "</script>\n";
 	}
 	
@@ -277,13 +291,14 @@ EOT;
 				$results[] = $result;
 			} else if ( $post = get_post($post_id) ) {
 				$result = array(
-					'id' => $post->ID,
-					'type' => $post->post_type,
-					'title' => $post->post_title,
-					'date' => $post->post_date,
+					'id'        => $post->ID,
+					'type'      => $post->post_type,
+					'title'     => $post->post_title,
+					'date'      => $post->post_date,
 					'permalink' => get_permalink($post->ID),
 					'thumbnail' => $this->get_the_thumbnail($post),
-					'excerpt' => $this->get_the_excerpt($post),
+					'excerpt'   => $this->get_the_excerpt($post),
+					'categories'=> explode(',', get_the_category_list(',', '', $post->ID)),
 					//'post' => $post,
 				);
 				set_transient($transient_key, $result, 5 * 60 );	// 5min * 60sec
