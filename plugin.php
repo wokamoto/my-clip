@@ -4,7 +4,7 @@ Plugin Name: My Clipping
 Plugin URI: 
 Description: 
 Author: wokamoto
-Version: 0.2.0
+Version: 0.2.1
 Author URI: http://dogmap.jp/
 
 License:
@@ -36,7 +36,6 @@ class MyClip {
 		if ( !is_admin() ) {
 			add_filter('the_content', array(&$this, 'add_clip'));
 			add_action('wp_enqueue_scripts', array(&$this,'add_scripts'));
-			add_action('wp_footer', array(&$this,'footer_scripts'));
 		}
 
 		// register ajax
@@ -335,7 +334,13 @@ class MyClipWidget extends WP_Widget {
 	}
 
 	public function widget( $args, $instance ) {
+		global $my_clip;
+	
+		if (!isset($my_clip))
+			$my_clip = New MyClip();
+
 		extract($args);
+		add_action('wp_footer', array(&$my_clip, 'footer_scripts'));
 		$title = apply_filters('widget_title', 
 			isset($instance['title']) ? trim($instance['title']) : '' ,
 			$instance ,
