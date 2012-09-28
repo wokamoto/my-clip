@@ -1,4 +1,0 @@
-my-clip
-=======
-
-WordPress Plugin

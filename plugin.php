@@ -1,10 +1,10 @@
 <?php
 /*
-Plugin Name: My Clipping
-Plugin URI: 
-Description: 
+Plugin Name: My Clippings
+Plugin URI: http://dogmap.jp/tag/my-clippings/
+Description: This plugin lets your site visitors create a list of their favorite posts. When they "clip" posts on your site, the post ID information is stored in their browser Cookie.
 Author: wokamoto
-Version: 0.2.1
+Version: 0.3.0
 Author URI: http://dogmap.jp/
 
 License:
@@ -27,8 +27,8 @@ License:
     along with this program; if not, write to the Free Software
     Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
-class MyClip {
-	const COOKIE_KEY = 'my_clip';
+class MyClippings {
+	const COOKIE_KEY = 'my_clippings';
 	const COOKIE_EXPIRES = 7;
 	private $clip_text = array();
 
@@ -45,7 +45,7 @@ class MyClip {
 		// register widget
 		add_action('widgets_init', array(&$this, 'register_widget'));
 		
-		$this->set_clip_text('クリップする', 'クリップ済み');
+		$this->set_clip_text('clip!', 'clipped');
 	}
 
 	public function add_scripts() {
@@ -315,32 +315,32 @@ EOT;
 
 	function register_widget() {
 		if ( class_exists('WP_Widget') )
-			register_widget('MyClipWidget');
+			register_widget('MyClippingsWidget');
 	}
 }
 
 /******************************************************************************
- * MyClipWidget Class ( for WP2.8+ )
+ * MyClippingsWidget Class ( for WP2.8+ )
  *****************************************************************************/
 if ( class_exists('WP_Widget') ) :
 
-class MyClipWidget extends WP_Widget {
+class MyClippingsWidget extends WP_Widget {
 	function __construct() {
 		$widget_ops = array(
-			'classname' => 'widget_my-clip' ,
-			'description' => 'My Clip',
+			'classname' => 'widget_my-clippings' ,
+			'description' => 'Lets your site visitors create a list of their favorite posts.',
 			);
-		$this->WP_Widget('my-clip', 'My Clip', $widget_ops);
+		$this->WP_Widget('my-clippings', 'My Clippings', $widget_ops);
 	}
 
 	public function widget( $args, $instance ) {
-		global $my_clip;
+		global $my_clippings;
 	
-		if (!isset($my_clip))
-			$my_clip = New MyClip();
+		if (!isset($my_clippings))
+			$my_clippings = New MyClippings();
 
 		extract($args);
-		add_action('wp_footer', array(&$my_clip, 'footer_scripts'));
+		add_action('wp_footer', array(&$my_clippings, 'footer_scripts'));
 		$title = apply_filters('widget_title', 
 			isset($instance['title']) ? trim($instance['title']) : '' ,
 			$instance ,
@@ -351,7 +351,7 @@ class MyClipWidget extends WP_Widget {
 		printf(
 			'<div class="my-clip_wrap limit-%1$d"><ul></ul><p><a href="#" class="more-clip" style="display:none">%2$s</a></p></div>' . "\n",
 			intval($instance['limit']) ,
-			'すべて表示'
+			'Show all Clips'
 			);
 		echo $after_widget;
 	}
@@ -388,24 +388,24 @@ endif;
 /******************************************************************************
  * functions
  *****************************************************************************/
-function init_my_clip_text($clip_text, $clipped_text){
-	global $my_clip;
+function init_my_clippings_text($clip_text, $clipped_text){
+	global $my_clippings;
 	
-	if (!isset($my_clip))
-		$my_clip = New MyClip();
-	echo $my_clip->set_clip_text($clip_text, $clipped_text);
+	if (!isset($my_clippings))
+		$my_clippings = New MyClippings();
+	echo $my_clippings->set_clip_text($clip_text, $clipped_text);
 }
 
-function my_clip($post_id, $before = '', $after = ''){
-	global $my_clip;
+function my_clippings($post_id, $before = '', $after = ''){
+	global $my_clippings;
 	
-	if (!isset($my_clip))
-		$my_clip = New MyClip();
-	echo $my_clip->clip_icon($post_id, $before, $after);
+	if (!isset($my_clippings))
+		$my_clippings = New MyClippings();
+	echo $my_clippings->clip_icon($post_id, $before, $after);
 }
 
 /******************************************************************************
  * Go Go Go!
  *****************************************************************************/
-global $my_clip;
-$my_clip = New MyClip();
+global $my_clippings;
+$my_clippings = New MyClippings();
