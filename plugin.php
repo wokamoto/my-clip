@@ -4,7 +4,7 @@ Plugin Name: My Clippings
 Plugin URI: http://dogmap.jp/tag/my-clippings/
 Description: This plugin lets your site visitors create a list of their favorite posts. When they "clip" posts on your site, the post ID information is stored in their browser Cookie.
 Author: wokamoto
-Version: 0.3.0
+Version: 0.3.1
 Author URI: http://dogmap.jp/
 
 License:
@@ -33,6 +33,18 @@ class MyClippings {
 	private $clip_text = array();
 
 	function __construct() {
+		$this->set_clip_text(
+			'<img src="'.plugins_url('/images/clipping.png', __FILE__).'" alt="clip!" title="clip!" class="clipping-image" width="36" height="30" />',
+			'<img src="'.plugins_url('/images/clipped.png', __FILE__).'" alt="clipped" title="unclip" class="clipped-image" width="36" height="30" />'
+			);
+
+		// register widget
+		add_action('widgets_init', array(&$this, 'register_widget'));
+		
+		add_action('init', array(&$this, 'initialize'));
+	}
+
+	public function initialize() {
 		if ( !is_admin() ) {
 			add_filter('the_content', array(&$this, 'add_clip'));
 			add_action('wp_enqueue_scripts', array(&$this,'add_scripts'));
@@ -41,11 +53,6 @@ class MyClippings {
 		// register ajax
 		add_action('wp_ajax_clip_search', array(&$this, 'clip_search'));
 		add_action('wp_ajax_nopriv_clip_search', array(&$this, 'clip_search') );
-
-		// register widget
-		add_action('widgets_init', array(&$this, 'register_widget'));
-		
-		$this->set_clip_text('clip!', 'clipped');
 	}
 
 	public function add_scripts() {
@@ -57,8 +64,8 @@ class MyClippings {
 		$ajax_url = admin_url('admin-ajax.php') . '?action=clip_search';
 		$cookie_key = self::COOKIE_KEY;
 		$cookie_expire = self::COOKIE_EXPIRES;
-		$clip_text = $this->clip_text[0];
-		$clipped_text = $this->clip_text[1];
+		$clip_text = str_replace('"', '\"', $this->clip_text[0]);
+		$clipped_text = str_replace('"', '\"', $this->clip_text[1]);
 
         echo "<script>\n";
         echo <<<EOT
@@ -388,7 +395,7 @@ endif;
 /******************************************************************************
  * functions
  *****************************************************************************/
-function init_my_clippings_text($clip_text, $clipped_text){
+function init_my_clippings($clip_text, $clipped_text){
 	global $my_clippings;
 	
 	if (!isset($my_clippings))
